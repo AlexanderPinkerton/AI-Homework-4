@@ -1,6 +1,6 @@
 
 from captureAgents import CaptureAgent
-import random, time, util
+import random, time, util, math
 from game import Directions
 import game
 from util import nearestPoint
@@ -97,8 +97,6 @@ class ReflexCaptureAgent(CaptureAgent):
     """
     features = self.getFeatures(gameState, action)
     weights = self.getWeights(gameState, action)
-    #print features
-    #print weights
     return features * weights
 
   def getFeatures(self, gameState, action):
@@ -122,6 +120,39 @@ class ReflexCaptureAgent(CaptureAgent):
   #distancer = Distancer(gameState.data.layout)
   #distancer.getDistance((1, 1), (10, 10))
 
+
+  def stayTowardMiddle(self, gameState, myPos):
+    middle = round(gameState.data.layout.width/2)
+    if self.red:
+      enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 0]
+      if myPos[0] < middle:
+         middleValue = min(enemyDist) + self.getMazeDistance(myPos,(middle,gameState.data.layout.height/2))
+      elif myPos[0] >= middle:
+         middleValue = 300
+    else:
+      enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 1]
+      if myPos[0] > middle:
+         middleValue = min(enemyDist) + self.getMazeDistance(myPos,(middle,gameState.data.layout.height/2))
+      elif myPos[0] <= middle:
+         middleValue = 300
+    return middleValue
+
+
+  def enemyRecentlyDied(self, gameState):
+     if gameState.data.timeleft < 1196:
+        previous = self.getPreviousObservation()
+        o = self.getEnemyDistances(previous)
+        c = self.getEnemyDistances(gameState)
+        for index in range(len(o)):
+            print c[index] - o[index]
+
+
+  def getEnemyDistances(self, gameState):
+    if self.red:
+      enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 0]
+    else:
+      enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 1]
+    return enemyDist
 
 
   def isEnemyCarrying(self, gameState):
@@ -169,13 +200,11 @@ class ExploitationAgent(ReflexCaptureAgent):
     myState = successor.getAgentState(self.index)
     myPos = myState.getPosition()
 
-    #Compute whether the enemy is carrying dots or not
-    features['enemyCarrying'] = self.isEnemyCarrying(gameState)
-    features['teamCarrying'] = self.isTeamCarrying(gameState)
+    #self.enemyRecentlyDied(gameState)
 
     # Computes whether we're on defense (1) or offense (0)
     features['onDefense'] = 1
-    if self.isEnemyCarrying(gameState): features['onDefense'] = 0
+    #if self.isEnemyCarrying(gameState): features['onDefense'] = 0
     #if myState.isPacman: features['onDefense'] = 0
 
 
@@ -198,10 +227,24 @@ class ExploitationAgent(ReflexCaptureAgent):
     rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
     if action == rev: features['reverse'] = 1
 
+    features['middleDistance'] = self.stayTowardMiddle(gameState, myPos)
+
     return features
 
   def getWeights(self, gameState, action):
-      return {'distanceToFood':-0, 'numInvaders': -1000, 'onDefense': 500, 'invaderDistance': -10, 'stop': -100, 'reverse': -2}
+      enemyCarrying = self.isEnemyCarrying(gameState)
+      teamCarrying = self.isTeamCarrying(gameState)
+
+      #Switch distance to food based on if they are recently dead
+
+      #use binary switches to turn weights on and off
+      return {'distanceToFood':0,
+              'numInvaders': -1000,
+              'onDefense': 100 * (teamCarrying+1),
+              'invaderDistance': -10 * enemyCarrying,
+              'stop': -100,
+              'reverse': -2,
+              'middleDistance': -100}
 
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
