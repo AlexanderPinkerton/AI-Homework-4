@@ -39,8 +39,15 @@ class ReflexCaptureAgent(CaptureAgent):
 
   def registerInitialState(self, gameState):
     self.start = gameState.getAgentPosition(self.index)
-    self.startFood = self.getFoodYouAreDefending(gameState)
-    self.carriedFood = self.startFood
+
+    #initialize food tracking for our food.
+    self.startFood_team = self.getFoodYouAreDefending(gameState)
+    self.carriedFood_team = self.startFood_team
+
+    #initialize food tracking for enemy food.
+    self.startFood_enemy = self.getFood(gameState)
+    self.carriedFood_enemy = self.startFood_enemy
+
     CaptureAgent.registerInitialState(self, gameState)
 
   def chooseAction(self, gameState):
@@ -119,18 +126,28 @@ class ReflexCaptureAgent(CaptureAgent):
 
   def isEnemyCarrying(self, gameState):
       currentFood = self.getFoodYouAreDefending(gameState)
-
       #If they are killed or capture the dots, reset the food tracker
-      if sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood.data):
-        self.startFood = currentFood
-        self.carriedFood = currentFood
-        print "RESET"
-
+      if sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood_team.data):
+        self.startFood_team = currentFood
+        self.carriedFood_team = currentFood
+        print "They dropped our food"
       #If there is less defended food than the start or last reset
-      if sum(x.count(1) for x in currentFood.data) < sum(x.count(1) for x in self.startFood.data):
-        self.carriedFood = currentFood
+      if sum(x.count(1) for x in currentFood.data) < sum(x.count(1) for x in self.startFood_team.data):
+        self.carriedFood_team = currentFood
         return 1
+      return 0
 
+  def isTeamCarrying(self, gameState):
+      currentFood = self.getFood(gameState)
+      #If they are killed or capture the dots, reset the food tracker
+      if sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood_enemy.data):
+        self.startFood_enemy = currentFood
+        self.carriedFood_enemy = currentFood
+        print "We dropped their food"
+      #If there is less defended food than the start or last reset
+      if sum(x.count(1) for x in currentFood.data) < sum(x.count(1) for x in self.startFood_enemy.data):
+        self.carriedFood_enemy = currentFood
+        return 1
       return 0
 
 
@@ -154,6 +171,7 @@ class ExploitationAgent(ReflexCaptureAgent):
 
     #Compute whether the enemy is carrying dots or not
     features['enemyCarrying'] = self.isEnemyCarrying(gameState)
+    features['teamCarrying'] = self.isTeamCarrying(gameState)
 
     # Computes whether we're on defense (1) or offense (0)
     features['onDefense'] = 1
@@ -245,6 +263,9 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
     if action == rev: features['reverse'] = 1
 
     return features
+
+  def getWeights(self, gameState, action):
+    return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -10, 'stop': -100, 'reverse': -2}
 
 # ----------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------
