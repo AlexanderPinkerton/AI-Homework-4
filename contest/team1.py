@@ -48,6 +48,12 @@ class ReflexCaptureAgent(CaptureAgent):
     self.startFood_enemy = self.getFood(gameState)
     self.carriedFood_enemy = self.startFood_enemy
 
+    self.midWidth = gameState.data.layout.width/2
+    self.midHeight = gameState.data.layout.height/2
+    while gameState.data.layout.walls[self.midWidth][self.midHeight]:
+        print "moving mid"
+        self.midHeight-=1
+
     CaptureAgent.registerInitialState(self, gameState)
 
   def chooseAction(self, gameState):
@@ -122,18 +128,18 @@ class ReflexCaptureAgent(CaptureAgent):
 
 
   def stayTowardMiddle(self, gameState, myPos):
-    middle = round(gameState.data.layout.width/2)
+
     if self.red:
       enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 0]
-      if myPos[0] < middle:
-         middleValue = min(enemyDist) + self.getMazeDistance(myPos,(middle,gameState.data.layout.height/2))
-      elif myPos[0] >= middle:
+      if myPos[0] < self.midWidth:
+         middleValue = min(enemyDist) + self.getMazeDistance(myPos,(self.midWidth,self.midHeight))
+      elif myPos[0] >= self.midWidth:
          middleValue = 300
     else:
       enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 1]
-      if myPos[0] > middle:
-         middleValue = min(enemyDist) + self.getMazeDistance(myPos,(middle,gameState.data.layout.height/2))
-      elif myPos[0] <= middle:
+      if myPos[0] > self.midWidth:
+         middleValue = min(enemyDist) + self.getMazeDistance(myPos,(self.midWidth,self.midHeight))
+      elif myPos[0] <= self.midWidth:
          middleValue = 300
     return middleValue
 
@@ -238,13 +244,13 @@ class ExploitationAgent(ReflexCaptureAgent):
       #Switch distance to food based on if they are recently dead
 
       #use binary switches to turn weights on and off
-      return {'distanceToFood':0,
+      return {'distanceToFood':-0,
               'numInvaders': -1000,
               'onDefense': 100 * (teamCarrying+1),
               'invaderDistance': -10 * enemyCarrying,
               'stop': -100,
               'reverse': -2,
-              'middleDistance': -100}
+              'middleDistance': -0.25}
 
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
