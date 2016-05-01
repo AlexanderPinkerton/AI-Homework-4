@@ -39,7 +39,8 @@ class ReflexCaptureAgent(CaptureAgent):
 
   def registerInitialState(self, gameState):
     self.start = gameState.getAgentPosition(self.index)
-    self.lastFood = self.getFoodYouAreDefending(gameState)
+    self.startFood = self.getFoodYouAreDefending(gameState)
+    self.carriedFood = self.startFood
     CaptureAgent.registerInitialState(self, gameState)
 
   def chooseAction(self, gameState):
@@ -95,6 +96,7 @@ class ReflexCaptureAgent(CaptureAgent):
     """
     Returns a counter of features for the state
     """
+
     features = util.Counter()
     successor = self.getSuccessor(gameState, action)
     features['successorScore'] = self.getScore(successor)
@@ -116,17 +118,19 @@ class ReflexCaptureAgent(CaptureAgent):
 
 
   def isEnemyCarrying(self, gameState):
-      lastGamestate = self.getPreviousObservation()
       currentFood = self.getFoodYouAreDefending(gameState)
 
-      for y in range(currentFood.width):
-        for x in range(currentFood.height):
-          if currentFood[y][x] != self.lastFood[y][x]:
-            self.lastFood = currentFood
-            return 1
+      #If they are killed or capture the dots, reset the food tracker
+      if sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood.data):
+        self.startFood = currentFood
+        self.carriedFood = currentFood
+        print "RESET"
 
+      #If there is less defended food than the start or last reset
+      if sum(x.count(1) for x in currentFood.data) < sum(x.count(1) for x in self.startFood.data):
+        self.carriedFood = currentFood
+        return 1
 
-      self.lastFood = currentFood
       return 0
 
 
