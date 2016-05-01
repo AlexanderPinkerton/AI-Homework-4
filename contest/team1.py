@@ -9,7 +9,7 @@ from util import nearestPoint
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first = 'OffensiveReflexAgent', second = 'ReflexCaptureAgent'):
+               first = 'ExploitationAgent', second = 'ExploitationAgent'):
   """
   This function should return a list of two agents that will form the
   team, initialized using firstIndex and secondIndex as their agent
@@ -90,6 +90,8 @@ class ReflexCaptureAgent(CaptureAgent):
     """
     features = self.getFeatures(gameState, action)
     weights = self.getWeights(gameState, action)
+    #print features
+    #print weights
     return features * weights
 
   def getFeatures(self, gameState, action):
@@ -100,8 +102,6 @@ class ReflexCaptureAgent(CaptureAgent):
     features = util.Counter()
     successor = self.getSuccessor(gameState, action)
     features['successorScore'] = self.getScore(successor)
-    if self.isEnemyCarrying(gameState):
-      print "They be packin"
     return features
 
   def getWeights(self, gameState, action):
@@ -137,6 +137,57 @@ class ReflexCaptureAgent(CaptureAgent):
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
 
+class ExploitationAgent(ReflexCaptureAgent):
+  """
+  A reflex agent that keeps its side Pacman-free. Again,
+  this is to give you an idea of what a defensive agent
+  could be like.  It is not the best or only way to make
+  such an agent.
+  """
+
+  def getFeatures(self, gameState, action):
+    features = util.Counter()
+    successor = self.getSuccessor(gameState, action)
+
+    myState = successor.getAgentState(self.index)
+    myPos = myState.getPosition()
+
+    #Compute whether the enemy is carrying dots or not
+    features['enemyCarrying'] = self.isEnemyCarrying(gameState)
+
+    # Computes whether we're on defense (1) or offense (0)
+    features['onDefense'] = 1
+    if self.isEnemyCarrying(gameState): features['onDefense'] = 0
+    #if myState.isPacman: features['onDefense'] = 0
+
+
+    # Compute distance to the nearest food
+    foodList = self.getFood(successor).asList()
+    if len(foodList) > 0:  # This should always be True,  but better safe than sorry
+        myPos = successor.getAgentState(self.index).getPosition()
+        minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
+        features['distanceToFood'] = minDistance
+
+    # Computes distance to invaders we can see
+    enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
+    invaders = [a for a in enemies if a.isPacman and a.getPosition() != None]
+    features['numInvaders'] = len(invaders)
+    if len(invaders) > 0:
+      dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
+      features['invaderDistance'] = min(dists)
+
+    if action == Directions.STOP: features['stop'] = 1
+    rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
+    if action == rev: features['reverse'] = 1
+
+    return features
+
+  def getWeights(self, gameState, action):
+      return {'distanceToFood':-0, 'numInvaders': -1000, 'onDefense': 500, 'invaderDistance': -10, 'stop': -100, 'reverse': -2}
+
+#----------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------
+
 class OffensiveReflexAgent(ReflexCaptureAgent):
   """
   A reflex agent that seeks food. This is an agent
@@ -150,7 +201,6 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
     features['successorScore'] = -len(foodList)#self.getScore(successor)
 
     # Compute distance to the nearest food
-
     if len(foodList) > 0: # This should always be True,  but better safe than sorry
       myPos = successor.getAgentState(self.index).getPosition()
       minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
