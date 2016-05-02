@@ -257,12 +257,12 @@ class ExploitationAgent(ReflexCaptureAgent):
 
       #use binary switches to turn weights on and off
       return {'distanceToFood':1 * (middleSwitch-1),
-              'numInvaders': -1000,
+              'numInvaders': -100,
               'onDefense': 100 * (teamCarrying+1),
               'invaderDistance': -10 * enemyCarrying,
               'stop': -100,
               'reverse': -2,
-              'middleDistance': -0.25,
+              'middleDistance': -0.025 * middleSwitch,
               'enemyDistance': -0}
 
 #----------------------------------------------------------------------------------------------------------
