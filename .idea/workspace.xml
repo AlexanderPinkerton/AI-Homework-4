@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="cf307862-ecd9-4077-8640-0ca28de6c59a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/contest/score" afterPath="$PROJECT_DIR$/contest/score" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/contest/team1.py" afterPath="$PROJECT_DIR$/contest/team1.py" />
     </list>
     <ignored path="AI-Homework-4.iws" />
@@ -57,9 +58,11 @@
       <file leaf-file-name="team1.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/contest/team1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1020">
-              <caret line="279" column="33" selection-start-line="279" selection-start-column="33" selection-end-line="279" selection-end-column="33" />
-              <folding />
+            <state relative-caret-position="1003">
+              <caret line="284" column="31" selection-start-line="284" selection-start-column="31" selection-end-line="284" selection-end-column="31" />
+              <folding>
+                <marker date="1462154678116" expanded="false" signature="1:141" placeholder="import ..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -513,7 +516,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1462154678116" expanded="false" signature="1:141" placeholder="import ..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -553,7 +558,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1462154678116" expanded="false" signature="1:141" placeholder="import ..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -593,7 +600,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1462154678116" expanded="false" signature="1:141" placeholder="import ..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -633,7 +642,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1462154678116" expanded="false" signature="1:141" placeholder="import ..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -692,9 +703,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/contest/team1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1020">
-          <caret line="279" column="33" selection-start-line="279" selection-start-column="33" selection-end-line="279" selection-end-column="33" />
-          <folding />
+        <state relative-caret-position="1003">
+          <caret line="284" column="31" selection-start-line="284" selection-start-column="31" selection-end-line="284" selection-end-column="31" />
+          <folding>
+            <marker date="1462154678116" expanded="false" signature="1:141" placeholder="import ..." />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -128,9 +128,13 @@ class ReflexCaptureAgent(CaptureAgent):
   #distancer = Distancer(gameState.data.layout)
   #distancer.getDistance((1, 1), (10, 10))
 
+  # ===========================================================================================
+  #======================================ADVANCED FEATURES=====================================
+  # ===========================================================================================
+
   def campCapsule(self, position, successor):
     capLocations = self.getCapsulesYouAreDefending(successor)
-
+    capDistances = 0
     if len(capLocations) > 0:
       for cx, cy in capLocations:
         capDistances = self.getMazeDistance(position, (cx,cy))
@@ -140,6 +144,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
   def stayTowardMiddle(self, gameState, myPos):
     distToMiddle = abs(myPos[0] - self.midWidth)
+    middleValue = 0
     if self.red:
       if myPos[0] <= self.midWidth:
         middleValue = self.getMazeDistance(myPos, (self.midWidth, self.midHeight)) / 4
@@ -277,7 +282,7 @@ class ExploitationAgent(ReflexCaptureAgent):
               'reverse': -2,
               'middleDistance': -0.025 * campSwitch,
               'enemyDistance': -0,
-              'capsuleCamp': -0.0015 * campSwitch}
+              'capsuleCamp': -0 * campSwitch}
 
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
