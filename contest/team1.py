@@ -54,6 +54,8 @@ class ReflexCaptureAgent(CaptureAgent):
         print "moving mid"
         self.midHeight-=1
 
+    self.recentDeath = 0
+
     CaptureAgent.registerInitialState(self, gameState)
 
   def chooseAction(self, gameState):
@@ -128,19 +130,19 @@ class ReflexCaptureAgent(CaptureAgent):
 
 
   def stayTowardMiddle(self, gameState, myPos):
-
+    distToMiddle = abs(myPos[0] - self.midWidth)
     if self.red:
-      enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 0]
-      if myPos[0] < self.midWidth:
-         middleValue = min(enemyDist) + self.getMazeDistance(myPos,(self.midWidth,self.midHeight))
-      elif myPos[0] >= self.midWidth:
-         middleValue = 300
+      if myPos[0] <= self.midWidth:
+        middleValue = self.getMazeDistance(myPos, (self.midWidth, self.midHeight)) / 4
+        # middleValue = distToMiddle/4
+      elif myPos[0] > self.midWidth:
+        middleValue = 300
     else:
-      enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 1]
-      if myPos[0] > self.midWidth:
-         middleValue = min(enemyDist) + self.getMazeDistance(myPos,(self.midWidth,self.midHeight))
-      elif myPos[0] <= self.midWidth:
-         middleValue = 300
+      if myPos[0] >= self.midWidth:
+        middleValue = self.getMazeDistance(myPos, (self.midWidth, self.midHeight)) / 4
+        # middleValue = distToMiddle/4
+      elif myPos[0] < self.midWidth:
+        middleValue = 300
     return middleValue
 
 
@@ -235,6 +237,8 @@ class ExploitationAgent(ReflexCaptureAgent):
 
     features['middleDistance'] = self.stayTowardMiddle(gameState, myPos)
 
+    features['enemyDistance'] = min(self.getEnemyDistances(gameState))
+
     return features
 
   def getWeights(self, gameState, action):
@@ -242,15 +246,24 @@ class ExploitationAgent(ReflexCaptureAgent):
       teamCarrying = self.isTeamCarrying(gameState)
 
       #Switch distance to food based on if they are recently dead
+      if self.recentDeath:
+          middleSwitch = 0
+      else:
+          middleSwitch = 1
+
+      if teamCarrying:
+          self.recentDeath = 0
+
 
       #use binary switches to turn weights on and off
-      return {'distanceToFood':-0,
+      return {'distanceToFood':1 * (middleSwitch-1),
               'numInvaders': -1000,
               'onDefense': 100 * (teamCarrying+1),
               'invaderDistance': -10 * enemyCarrying,
               'stop': -100,
               'reverse': -2,
-              'middleDistance': -0.25}
+              'middleDistance': -0.25,
+              'enemyDistance': -0}
 
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
