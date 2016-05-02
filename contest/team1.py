@@ -295,7 +295,7 @@ class ExploitationAgent(ReflexCaptureAgent):
       if self.teamCarrying:
           self.recentDeath = 0
 
-
+      #TODO Make sure code will work for either teams
       #use binary switches to turn weights on and off
       return {'successorScore':-100 * (campSwitch-1),
               'distanceToFood':1 * (campSwitch-1),
@@ -306,7 +306,7 @@ class ExploitationAgent(ReflexCaptureAgent):
               'reverse': -2,
               'middleDistance': -0.25 * campSwitch,
               'enemyDistance': -.5,
-              'capsuleCamp': -0 * campSwitch}
+              'capsuleCamp': -0.25 * campSwitch}
 
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
