@@ -2,7 +2,7 @@
 from captureAgents import CaptureAgent
 import random, time, util, math
 from game import Directions
-import game
+from random import randint
 from util import nearestPoint
 #################
 # Team creation #
@@ -52,7 +52,7 @@ class ReflexCaptureAgent(CaptureAgent):
     self.midHeight = gameState.data.layout.height/2
     while gameState.data.layout.walls[self.midWidth][self.midHeight]:
         print "moving mid"
-        self.midHeight-=1
+        self.midHeight+=randint(-1,1)
 
     self.recentDeath = 0
     self.safetySwitch = 0
@@ -143,14 +143,23 @@ class ReflexCaptureAgent(CaptureAgent):
           canGetFood = False
       return canGetFood
 
-  def campCapsule(self, position, successor):
-    capLocations = self.getCapsulesYouAreDefending(successor)
-    capDistances = 0
-    if len(capLocations) > 0:
-      for cx, cy in capLocations:
-        capDistances = self.getMazeDistance(position, (cx,cy))
 
-    return capDistances
+  def campCapsule(self, position, successor):
+
+      capLocations = self.getCapsulesYouAreDefending(successor)
+      capDistances = 0
+
+      if len(capLocations) > 0:
+          for cx, cy in capLocations:
+              capDistances = self.getMazeDistance(position, (cx, cy))
+
+      if len(capLocations) > 1:
+          if self.index == 0 or self.index == 1:
+              capDistances = self.getMazeDistance(position, capLocations[0])
+          else:
+              capDistances = self.getMazeDistance(position, capLocations[1])
+
+      return capDistances
 
 
   def stayTowardMiddle(self, gameState, myPos):
@@ -306,7 +315,7 @@ class ExploitationAgent(ReflexCaptureAgent):
               'reverse': -2,
               'middleDistance': -0.25 * campSwitch,
               'enemyDistance': -.5,
-              'capsuleCamp': -0.25 * campSwitch}
+              'capsuleCamp': -.25 * campSwitch}
 
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
