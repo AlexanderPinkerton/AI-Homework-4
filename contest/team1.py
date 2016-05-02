@@ -132,6 +132,16 @@ class ReflexCaptureAgent(CaptureAgent):
   #======================================ADVANCED FEATURES=====================================
   # ===========================================================================================
 
+  def isSafe(self, gameState, myPos, foodList):
+      safetyThresh = 0.5
+      enemyDist = self.getEnemyDistances(gameState)
+      closestFood = min([self.getMazeDistance(myPos, food) for food in foodList])
+      if enemyDist[0] > safetyThresh * closestFood and enemyDist[1] > safetyThresh * closestFood:
+          canGetFood = True
+      else:
+          canGetFood = False
+      return canGetFood
+
   def campCapsule(self, position, successor):
     capLocations = self.getCapsulesYouAreDefending(successor)
     capDistances = 0
@@ -198,6 +208,7 @@ class ReflexCaptureAgent(CaptureAgent):
       if sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood_enemy.data):
         self.startFood_enemy = currentFood
         self.carriedFood_enemy = currentFood
+        self.recentDeath = 0
         print "We dropped their food"
       #If there is less defended food than the start or last reset
       if sum(x.count(1) for x in currentFood.data) < sum(x.count(1) for x in self.startFood_enemy.data):
@@ -257,14 +268,18 @@ class ExploitationAgent(ReflexCaptureAgent):
 
     features['capsuleCamp'] = self.campCapsule(myPos, successor)
 
+    self.safe = self.isSafe(gameState, myPos, foodList)
+
     return features
 
   def getWeights(self, gameState, action):
       enemyCarrying = self.isEnemyCarrying(gameState)
       teamCarrying = self.isTeamCarrying(gameState)
 
+
       #Switch distance to food based on if they are recently dead
-      if self.recentDeath:
+      if self.safe:
+      #if self.recentDeath:
           campSwitch = 0
       else:
           campSwitch = 1
@@ -273,15 +288,16 @@ class ExploitationAgent(ReflexCaptureAgent):
           self.recentDeath = 0
 
 
+
       #use binary switches to turn weights on and off
-      return {'distanceToFood':20 * (campSwitch-1),
+      return {'distanceToFood':1 * (campSwitch-1),
               'numInvaders': -100,
               'onDefense': 100 * (teamCarrying+1),
-              'invaderDistance': -10 * enemyCarrying,
+              'invaderDistance': -100 * enemyCarrying,
               'stop': -100,
               'reverse': -2,
               'middleDistance': -0.025 * campSwitch,
-              'enemyDistance': -0,
+              'enemyDistance': -.5,
               'capsuleCamp': -0 * campSwitch}
 
 #----------------------------------------------------------------------------------------------------------
