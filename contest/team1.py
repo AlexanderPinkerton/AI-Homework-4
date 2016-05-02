@@ -187,7 +187,7 @@ class ReflexCaptureAgent(CaptureAgent):
       enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 1]
     return enemyDist
 
-
+  #TODO Make it so that they are no longer carrying when scored
   def isEnemyCarrying(self, gameState):
       currentFood = self.getFoodYouAreDefending(gameState)
       #If they are killed or capture the dots, reset the food tracker
@@ -278,8 +278,8 @@ class ExploitationAgent(ReflexCaptureAgent):
 
 
       #Switch distance to food based on if they are recently dead
-      if self.safe:
-      #if self.recentDeath:
+      #if self.safe:
+      if self.recentDeath:
           campSwitch = 0
       else:
           campSwitch = 1

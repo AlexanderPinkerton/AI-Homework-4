@@ -58,10 +58,10 @@
       <file leaf-file-name="team1.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/contest/team1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="288" column="0" selection-start-line="288" selection-start-column="0" selection-end-line="288" selection-end-column="0" />
+            <state relative-caret-position="357">
+              <caret line="189" column="63" selection-start-line="189" selection-start-column="63" selection-end-line="189" selection-end-column="63" />
               <folding>
-                <marker date="1462158491134" expanded="false" signature="1:141" placeholder="import ..." />
+                <marker date="1462158889257" expanded="false" signature="1:141" placeholder="import ..." />
               </folding>
             </state>
           </provider>
@@ -343,7 +343,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="AI-Homework-4" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/contest/capture.py" />
-      <option name="PARAMETERS" value="-r baselineTeam -b team1 -l RANDOM-98723" />
+      <option name="PARAMETERS" value="-r baselineTeam -b team1 -l RANDOM-1244" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
@@ -517,7 +517,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1462158491134" expanded="false" signature="1:141" placeholder="import ..." />
+            <marker date="1462158889257" expanded="false" signature="1:141" placeholder="import ..." />
           </folding>
         </state>
       </provider>
@@ -559,7 +559,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1462158491134" expanded="false" signature="1:141" placeholder="import ..." />
+            <marker date="1462158889257" expanded="false" signature="1:141" placeholder="import ..." />
           </folding>
         </state>
       </provider>
@@ -601,7 +601,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1462158491134" expanded="false" signature="1:141" placeholder="import ..." />
+            <marker date="1462158889257" expanded="false" signature="1:141" placeholder="import ..." />
           </folding>
         </state>
       </provider>
@@ -643,7 +643,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1462158491134" expanded="false" signature="1:141" placeholder="import ..." />
+            <marker date="1462158889257" expanded="false" signature="1:141" placeholder="import ..." />
           </folding>
         </state>
       </provider>
@@ -703,10 +703,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/contest/team1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="288" column="0" selection-start-line="288" selection-start-column="0" selection-end-line="288" selection-end-column="0" />
+        <state relative-caret-position="357">
+          <caret line="189" column="63" selection-start-line="189" selection-start-column="63" selection-end-line="189" selection-end-column="63" />
           <folding>
-            <marker date="1462158491134" expanded="false" signature="1:141" placeholder="import ..." />
+            <marker date="1462158889257" expanded="false" signature="1:141" placeholder="import ..." />
           </folding>
         </state>
       </provider>
