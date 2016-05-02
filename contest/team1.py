@@ -188,30 +188,59 @@ class ReflexCaptureAgent(CaptureAgent):
   #
   #   return middleValue
 
+  # def stayTowardMiddle(self, gameState, myPos):
+  #     if self.redMidHeight is None:
+  #         self.redMidWidth = (gameState.data.layout.width / 2) - 2
+  #         self.redMidHeight = gameState.data.layout.height / 2
+  #         self.blueMidWidth = (gameState.data.layout.width / 2) + 2
+  #         self.blueMidHeight = gameState.data.layout.height / 2
+  #         while gameState.data.layout.walls[self.redMidWidth][self.redMidHeight]:
+  #             print "moving mid"
+  #             self.redMidHeight += 1
+  #             self.redMidWidth -= 1
+  #         while gameState.data.layout.walls[self.blueMidWidth][self.blueMidHeight]:
+  #             print "moving mid"
+  #             self.blueMidHeight -= 1
+  #             self.blueMidWidth += 1
+  #     if self.red:
+  #         if myPos[0] <= self.redMidWidth:
+  #             middleValue = self.getMazeDistance(myPos, (self.redMidWidth, self.redMidHeight))
+  #         elif myPos[0] > self.redMidWidth:
+  #             middleValue = 300 + self.getMazeDistance(myPos, (self.redMidWidth, self.redMidHeight))
+  #     else:
+  #         if myPos[0] >= self.blueMidWidth:
+  #             middleValue = self.getMazeDistance(myPos, (self.blueMidWidth, self.blueMidHeight))
+  #         elif myPos[0] < self.blueMidWidth:
+  #             middleValue = 300 + self.getMazeDistance(myPos, (self.blueMidWidth, self.blueMidHeight))
+  #
+  #     return middleValue
+
   def stayTowardMiddle(self, gameState, myPos):
-      if self.redMidHeight is None:
-          self.redMidWidth = (gameState.data.layout.width / 2) - 2
-          self.redMidHeight = gameState.data.layout.height / 2
-          self.blueMidWidth = (gameState.data.layout.width / 2) + 2
-          self.blueMidHeight = gameState.data.layout.height / 2
-          while gameState.data.layout.walls[self.redMidWidth][self.redMidHeight]:
-              print "moving mid"
-              self.redMidHeight += 1
-              self.redMidWidth -= 1
-          while gameState.data.layout.walls[self.blueMidWidth][self.blueMidHeight]:
-              print "moving mid"
-              self.blueMidHeight -= 1
-              self.blueMidWidth += 1
+      middleValue = 0
       if self.red:
-          if myPos[0] <= self.redMidWidth:
-              middleValue = self.getMazeDistance(myPos, (self.redMidWidth, self.redMidHeight))
-          elif myPos[0] > self.redMidWidth:
-              middleValue = 300 + self.getMazeDistance(myPos, (self.redMidWidth, self.redMidHeight))
+          yourFood = self.getFoodYouAreDefending(gameState)
+          yourFoodList = [(x, y) for x in range(yourFood.width) for y in range(yourFood.height) if
+                          yourFood[x][y] is True]
+          redFocusFood = yourFoodList[0]
+          for i in range(len(yourFoodList)):
+              if (yourFoodList[i])[0] > redFocusFood[0]:
+                  redFocusFood = yourFoodList[i]
+          if myPos[0] <= redFocusFood[0]:
+              middleValue = self.getMazeDistance(myPos, redFocusFood)
+          elif myPos[0] > redFocusFood[0]:
+              middleValue = 300 + self.getMazeDistance(myPos, redFocusFood)
       else:
-          if myPos[0] >= self.blueMidWidth:
-              middleValue = self.getMazeDistance(myPos, (self.blueMidWidth, self.blueMidHeight))
-          elif myPos[0] < self.blueMidWidth:
-              middleValue = 300 + self.getMazeDistance(myPos, (self.blueMidWidth, self.blueMidHeight))
+          yourFood = self.getFoodYouAreDefending(gameState)
+          yourFoodList = [(x, y) for x in range(yourFood.width) for y in range(yourFood.height) if
+                          yourFood[x][y] is True]
+          blueFocusFood = yourFoodList[0]
+          for i in range(len(yourFoodList)):
+              if (yourFoodList[i])[0] < blueFocusFood[0]:
+                  blueFocusFood = yourFoodList[i]
+          if myPos[0] >= blueFocusFood[0]:
+              middleValue = self.getMazeDistance(myPos, blueFocusFood)
+          elif myPos[0] < blueFocusFood[0]:
+              middleValue = 300 + self.getMazeDistance(myPos, blueFocusFood)
 
       return middleValue
 
