@@ -55,6 +55,7 @@ class ReflexCaptureAgent(CaptureAgent):
         self.midHeight-=1
 
     self.recentDeath = 0
+    self.safetySwitch = 0
 
     CaptureAgent.registerInitialState(self, gameState)
 
@@ -133,7 +134,7 @@ class ReflexCaptureAgent(CaptureAgent):
   # ===========================================================================================
 
   def isSafe(self, gameState, myPos, foodList):
-      safetyThresh = 0.5
+      safetyThresh = 1.5
       enemyDist = self.getEnemyDistances(gameState)
       closestFood = min([self.getMazeDistance(myPos, food) for food in foodList])
       if enemyDist[0] > safetyThresh * closestFood and enemyDist[1] > safetyThresh * closestFood:
@@ -213,6 +214,7 @@ class ReflexCaptureAgent(CaptureAgent):
       #If there is less defended food than the start or last reset
       if sum(x.count(1) for x in currentFood.data) < sum(x.count(1) for x in self.startFood_enemy.data):
         self.carriedFood_enemy = currentFood
+        self.safetySwitch = 0
         return 1
       return 0
 
@@ -243,12 +245,14 @@ class ExploitationAgent(ReflexCaptureAgent):
     #if myState.isPacman: features['onDefense'] = 0
 
 
+
     # Compute distance to the nearest food
     foodList = self.getFood(successor).asList()
     if len(foodList) > 0:  # This should always be True,  but better safe than sorry
         myPos = successor.getAgentState(self.index).getPosition()
         minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
         features['distanceToFood'] = minDistance
+
 
     # Computes distance to invaders we can see
     enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
@@ -262,13 +266,17 @@ class ExploitationAgent(ReflexCaptureAgent):
     rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
     if action == rev: features['reverse'] = 1
 
-    features['middleDistance'] = self.stayTowardMiddle(gameState, myPos)
+    features['successorScore'] = -len(foodList)#self.getScore(successor)
 
-    features['enemyDistance'] = min(self.getEnemyDistances(gameState))
+    features['middleDistance'] = self.stayTowardMiddle(successor, myPos)
+
+    features['enemyDistance'] = min(self.getEnemyDistances(successor))
 
     features['capsuleCamp'] = self.campCapsule(myPos, successor)
 
-    self.safe = self.isSafe(gameState, myPos, foodList)
+    self.safe = self.isSafe(successor, myPos, foodList)
+    if self.safe:
+        self.safetySwitch = 1
 
     return features
 
@@ -278,7 +286,7 @@ class ExploitationAgent(ReflexCaptureAgent):
 
 
       #Switch distance to food based on if they are recently dead
-      #if self.safe:
+      #if self.safetySwitch:
       if self.recentDeath:
           campSwitch = 0
       else:
@@ -288,15 +296,15 @@ class ExploitationAgent(ReflexCaptureAgent):
           self.recentDeath = 0
 
 
-
       #use binary switches to turn weights on and off
-      return {'distanceToFood':1 * (campSwitch-1),
+      return {'successorScore':-100 * (campSwitch-1),
+              'distanceToFood':1 * (campSwitch-1),
               'numInvaders': -100,
-              'onDefense': 100 * (teamCarrying+1),
+              'onDefense': 10 * (teamCarrying+1),
               'invaderDistance': -100 * enemyCarrying,
               'stop': -100,
               'reverse': -2,
-              'middleDistance': -0.025 * campSwitch,
+              'middleDistance': -0.25 * campSwitch,
               'enemyDistance': -.5,
               'capsuleCamp': -0 * campSwitch}
 
