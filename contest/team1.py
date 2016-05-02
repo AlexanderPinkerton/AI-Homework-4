@@ -48,11 +48,17 @@ class ReflexCaptureAgent(CaptureAgent):
     self.startFood_enemy = self.getFood(gameState)
     self.carriedFood_enemy = self.startFood_enemy
 
-    self.midWidth = gameState.data.layout.width/2
-    self.midHeight = gameState.data.layout.height/2
-    while gameState.data.layout.walls[self.midWidth][self.midHeight]:
-        print "moving mid"
-        self.midHeight+=randint(-1,1)
+    # self.midWidth = gameState.data.layout.width/2
+    # self.midHeight = gameState.data.layout.height/2
+    # while gameState.data.layout.walls[self.midWidth][self.midHeight]:
+    #     print "moving mid"
+    #     self.midHeight+=randint(-1,1)
+
+
+    self.redMidWidth = None
+    self.redMidHeight = None
+    self.blueMidWidth = None
+    self.blueMidHeight = None
 
     self.recentDeath = 0
     self.safetySwitch = 0
@@ -162,23 +168,50 @@ class ReflexCaptureAgent(CaptureAgent):
       return capDistances
 
 
-  def stayTowardMiddle(self, gameState, myPos):
-    distToMiddle = abs(myPos[0] - self.midWidth)
-    middleValue = 0
-    if self.red:
-      if myPos[0] <= self.midWidth:
-        middleValue = self.getMazeDistance(myPos, (self.midWidth, self.midHeight)) / 4
-        # middleValue = distToMiddle/4
-      elif myPos[0] > self.midWidth:
-        middleValue = 300
-    else:
-      if myPos[0] >= self.midWidth:
-        middleValue = self.getMazeDistance(myPos, (self.midWidth, self.midHeight)) / 4
-        # middleValue = distToMiddle/4
-      elif myPos[0] < self.midWidth:
-        middleValue = 300
+  # def stayTowardMiddle(self, gameState, myPos):
+  #   distToMiddle = abs(myPos[0] - self.midWidth)
+  #   middleValue = 0
+  #   if self.red:
+  #     if myPos[0] <= self.midWidth:
+  #       middleValue = self.getMazeDistance(myPos, (self.midWidth, self.midHeight)) / 4
+  #       # middleValue = distToMiddle/4
+  #     elif myPos[0] > self.midWidth:
+  #       middleValue = 300
+  #   else:
+  #     if myPos[0] >= self.midWidth:
+  #       middleValue = self.getMazeDistance(myPos, (self.midWidth, self.midHeight)) / 4
+  #       # middleValue = distToMiddle/4
+  #     elif myPos[0] < self.midWidth:
+  #       middleValue = 300
+  #
+  #   return middleValue
 
-    return middleValue
+  def stayTowardMiddle(self, gameState, myPos):
+      if self.redMidHeight is None:
+          self.redMidWidth = (gameState.data.layout.width / 2) - 2
+          self.redMidHeight = gameState.data.layout.height / 2
+          self.blueMidWidth = (gameState.data.layout.width / 2) + 2
+          self.blueMidHeight = gameState.data.layout.height / 2
+          while gameState.data.layout.walls[self.redMidWidth][self.redMidHeight]:
+              print "moving mid"
+              self.redMidHeight += 1
+              self.redMidWidth -= 1
+          while gameState.data.layout.walls[self.blueMidWidth][self.blueMidHeight]:
+              print "moving mid"
+              self.blueMidHeight -= 1
+              self.blueMidWidth += 1
+      if self.red:
+          if myPos[0] <= self.redMidWidth:
+              middleValue = self.getMazeDistance(myPos, (self.redMidWidth, self.redMidHeight))
+          elif myPos[0] > self.redMidWidth:
+              middleValue = 300 + self.getMazeDistance(myPos, (self.redMidWidth, self.redMidHeight))
+      else:
+          if myPos[0] >= self.blueMidWidth:
+              middleValue = self.getMazeDistance(myPos, (self.blueMidWidth, self.blueMidHeight))
+          elif myPos[0] < self.blueMidWidth:
+              middleValue = 300 + self.getMazeDistance(myPos, (self.blueMidWidth, self.blueMidHeight))
+
+      return middleValue
 
 
   def enemyRecentlyDied(self, gameState):
@@ -252,7 +285,6 @@ class ExploitationAgent(ReflexCaptureAgent):
     features['onDefense'] = 1
     #if self.isEnemyCarrying(gameState): features['onDefense'] = 0
     #if myState.isPacman: features['onDefense'] = 0
-
 
 
     # Compute distance to the nearest food
