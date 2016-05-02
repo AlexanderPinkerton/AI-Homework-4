@@ -169,6 +169,7 @@ class ReflexCaptureAgent(CaptureAgent):
       if sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood_team.data):
         self.startFood_team = currentFood
         self.carriedFood_team = currentFood
+        self.recentDeath = 1
         print "They dropped our food"
       #If there is less defended food than the start or last reset
       if sum(x.count(1) for x in currentFood.data) < sum(x.count(1) for x in self.startFood_team.data):
@@ -254,9 +255,10 @@ class ExploitationAgent(ReflexCaptureAgent):
       if teamCarrying:
           self.recentDeath = 0
 
+      print middleSwitch
 
       #use binary switches to turn weights on and off
-      return {'distanceToFood':1 * (middleSwitch-1),
+      return {'distanceToFood':20 * (middleSwitch-1),
               'numInvaders': -100,
               'onDefense': 100 * (teamCarrying+1),
               'invaderDistance': -10 * enemyCarrying,
