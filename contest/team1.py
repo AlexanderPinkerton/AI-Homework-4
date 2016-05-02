@@ -63,6 +63,8 @@ class ReflexCaptureAgent(CaptureAgent):
     self.recentDeath = 0
     self.safetySwitch = 0
 
+    self.pastObservation = gameState
+
     CaptureAgent.registerInitialState(self, gameState)
 
   def chooseAction(self, gameState):
@@ -214,10 +216,8 @@ class ReflexCaptureAgent(CaptureAgent):
       return middleValue
 
 
-  def enemyRecentlyDied(self, gameState):
-     if gameState.data.timeleft < 1196:
-        previous = self.getPreviousObservation()
-        o = self.getEnemyDistances(previous)
+  def enemyRecentlyDied(self, gameState, pastObservation):
+        o = self.getEnemyDistances(pastObservation)
         c = self.getEnemyDistances(gameState)
         for index in range(len(o)):
             print c[index] - o[index]
@@ -231,28 +231,62 @@ class ReflexCaptureAgent(CaptureAgent):
     return enemyDist
 
   #TODO Make it so that they are no longer carrying when scored
-  def isEnemyCarrying(self, gameState):
+  def isEnemyCarrying(self, gameState, pastObservation):
       currentFood = self.getFoodYouAreDefending(gameState)
+
       #If they are killed or capture the dots, reset the food tracker
-      if sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood_team.data):
+      scoreChange = gameState.data.score - pastObservation.data.score
+
+      enemyScored = 0
+      if self.red:
+          if scoreChange < 0:
+              print "enemy Scored"
+              enemyScored = 1
+      else:
+          if scoreChange > 0:
+              print "enemy Scored"
+              enemyScored = 1
+
+      foodDropped = sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood_team.data)
+      if foodDropped:
+          print "They dropped our food"
+
+      if foodDropped or enemyScored:
         self.startFood_team = currentFood
         self.carriedFood_team = currentFood
         self.recentDeath = 1
-        print "They dropped our food"
+        #print "They dropped our food"
       #If there is less defended food than the start or last reset
       if sum(x.count(1) for x in currentFood.data) < sum(x.count(1) for x in self.startFood_team.data):
         self.carriedFood_team = currentFood
         return 1
       return 0
 
-  def isTeamCarrying(self, gameState):
+  def isTeamCarrying(self, gameState, pastObservation):
       currentFood = self.getFood(gameState)
+
       #If they are killed or capture the dots, reset the food tracker
-      if sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood_enemy.data):
+      scoreChange = gameState.data.score - pastObservation.data.score
+
+      teamScored = 0
+      if self.red:
+          if scoreChange > 0:
+              print "we Scored"
+              teamScored = 1
+      else:
+          if scoreChange < 0:
+              print "we Scored"
+              teamScored = 1
+
+      foodDropped = sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood_enemy.data)
+      if foodDropped:
+          print "We dropped their food"
+
+      if foodDropped or teamScored:
         self.startFood_enemy = currentFood
         self.carriedFood_enemy = currentFood
         self.recentDeath = 0
-        print "We dropped their food"
+        #print "We dropped their food"
       #If there is less defended food than the start or last reset
       if sum(x.count(1) for x in currentFood.data) < sum(x.count(1) for x in self.startFood_enemy.data):
         self.carriedFood_enemy = currentFood
@@ -278,6 +312,9 @@ class ExploitationAgent(ReflexCaptureAgent):
 
     myState = successor.getAgentState(self.index)
     myPos = myState.getPosition()
+
+    if gameState.data.timeleft < 1196:
+        self.pastObservation = self.getPreviousObservation()
 
     #self.enemyRecentlyDied(gameState)
 
@@ -319,8 +356,9 @@ class ExploitationAgent(ReflexCaptureAgent):
     if self.safe:
         self.safetySwitch = 1
 
-    self.enemyCarrying = self.isEnemyCarrying(gameState)
-    self.teamCarrying = self.isTeamCarrying(gameState)
+
+    self.enemyCarrying = self.isEnemyCarrying(gameState, self.pastObservation)
+    self.teamCarrying = self.isTeamCarrying(gameState, self.pastObservation)
 
     return features
 
