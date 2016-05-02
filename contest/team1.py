@@ -128,6 +128,15 @@ class ReflexCaptureAgent(CaptureAgent):
   #distancer = Distancer(gameState.data.layout)
   #distancer.getDistance((1, 1), (10, 10))
 
+  def campCapsule(self, position, successor):
+    capLocations = self.getCapsulesYouAreDefending(successor)
+
+    if len(capLocations) > 0:
+      for cx, cy in capLocations:
+        capDistances = self.getMazeDistance(position, (cx,cy))
+
+    return capDistances
+
 
   def stayTowardMiddle(self, gameState, myPos):
     distToMiddle = abs(myPos[0] - self.midWidth)
@@ -143,6 +152,7 @@ class ReflexCaptureAgent(CaptureAgent):
         # middleValue = distToMiddle/4
       elif myPos[0] < self.midWidth:
         middleValue = 300
+
     return middleValue
 
 
@@ -240,6 +250,8 @@ class ExploitationAgent(ReflexCaptureAgent):
 
     features['enemyDistance'] = min(self.getEnemyDistances(gameState))
 
+    features['capsuleCamp'] = self.campCapsule(myPos, successor)
+
     return features
 
   def getWeights(self, gameState, action):
@@ -248,24 +260,24 @@ class ExploitationAgent(ReflexCaptureAgent):
 
       #Switch distance to food based on if they are recently dead
       if self.recentDeath:
-          middleSwitch = 0
+          campSwitch = 0
       else:
-          middleSwitch = 1
+          campSwitch = 1
 
       if teamCarrying:
           self.recentDeath = 0
 
-      print middleSwitch
 
       #use binary switches to turn weights on and off
-      return {'distanceToFood':20 * (middleSwitch-1),
+      return {'distanceToFood':20 * (campSwitch-1),
               'numInvaders': -100,
               'onDefense': 100 * (teamCarrying+1),
               'invaderDistance': -10 * enemyCarrying,
               'stop': -100,
               'reverse': -2,
-              'middleDistance': -0.025 * middleSwitch,
-              'enemyDistance': -0}
+              'middleDistance': -0.025 * campSwitch,
+              'enemyDistance': -0,
+              'capsuleCamp': -0.0015 * campSwitch}
 
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
