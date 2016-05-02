@@ -268,22 +268,22 @@ class ExploitationAgent(ReflexCaptureAgent):
 
     features['successorScore'] = -len(foodList)#self.getScore(successor)
 
-    features['middleDistance'] = self.stayTowardMiddle(successor, myPos)
+    features['middleDistance'] = self.stayTowardMiddle(gameState, myPos)
 
-    features['enemyDistance'] = min(self.getEnemyDistances(successor))
+    features['enemyDistance'] = min(self.getEnemyDistances(gameState))
 
-    features['capsuleCamp'] = self.campCapsule(myPos, successor)
+    features['capsuleCamp'] = self.campCapsule(myPos, gameState)
 
-    self.safe = self.isSafe(successor, myPos, foodList)
+    self.safe = self.isSafe(gameState, myPos, foodList)
     if self.safe:
         self.safetySwitch = 1
+
+    self.enemyCarrying = self.isEnemyCarrying(gameState)
+    self.teamCarrying = self.isTeamCarrying(gameState)
 
     return features
 
   def getWeights(self, gameState, action):
-      enemyCarrying = self.isEnemyCarrying(gameState)
-      teamCarrying = self.isTeamCarrying(gameState)
-
 
       #Switch distance to food based on if they are recently dead
       #if self.safetySwitch:
@@ -292,7 +292,7 @@ class ExploitationAgent(ReflexCaptureAgent):
       else:
           campSwitch = 1
 
-      if teamCarrying:
+      if self.teamCarrying:
           self.recentDeath = 0
 
 
@@ -300,8 +300,8 @@ class ExploitationAgent(ReflexCaptureAgent):
       return {'successorScore':-100 * (campSwitch-1),
               'distanceToFood':1 * (campSwitch-1),
               'numInvaders': -100,
-              'onDefense': 10 * (teamCarrying+1),
-              'invaderDistance': -100 * enemyCarrying,
+              'onDefense': 10 * (self.teamCarrying+1),
+              'invaderDistance': -10 * self.enemyCarrying,
               'stop': -100,
               'reverse': -2,
               'middleDistance': -0.25 * campSwitch,
