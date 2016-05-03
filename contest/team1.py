@@ -56,6 +56,8 @@ class ReflexCaptureAgent(CaptureAgent):
     self.recentDeath = 0
     self.safetySwitch = 0
 
+    self.losing = False
+
     self.pastObservation = gameState
 
     CaptureAgent.registerInitialState(self, gameState)
@@ -346,10 +348,18 @@ class ExploitationAgent(ReflexCaptureAgent):
       else:
           campSwitch = 1
 
+      #Check if we are winning or not.
+      self.losing = (self.red and gameState.data.score <= 0) or (not self.red and gameState.data.score >= 0)
+
+      #If time is almost up, we are losing, and we arent holding --> GO AFTER DOTS
+      if gameState.data.timeleft < 400 and not self.teamCarrying and self.losing:
+          campSwitch = 0
+          print "GET DOTS BEFORE WE LOSE"
+
+      #Grab a dot and peace out.
       if self.teamCarrying:
           self.recentDeath = 0
 
-      #TODO Make sure code will work for either teams
       #use binary switches to turn weights on and off
       return {'successorScore':-100 * (campSwitch-1),
               'distanceToFood':1 * (campSwitch-1),
