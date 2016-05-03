@@ -134,7 +134,7 @@ class ReflexCaptureAgent(CaptureAgent):
   # ===========================================================================================
 
   def isSafe(self, gameState, myPos, foodList):
-      safetyThresh = 1.5
+      safetyThresh = 2
       enemyDist = self.getEnemyDistances(gameState)
       closestFood = min([self.getMazeDistance(myPos, food) for food in foodList])
       if enemyDist[0] > safetyThresh * closestFood and enemyDist[1] > safetyThresh * closestFood:
