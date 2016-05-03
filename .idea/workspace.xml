@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="cf307862-ecd9-4077-8640-0ca28de6c59a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/contest/score" afterPath="$PROJECT_DIR$/contest/score" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/contest/team1.py" afterPath="$PROJECT_DIR$/contest/team1.py" />
     </list>
     <ignored path="AI-Homework-4.iws" />
@@ -58,8 +57,8 @@
       <file leaf-file-name="team1.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/contest/team1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="218" column="21" selection-start-line="218" selection-start-column="21" selection-end-line="218" selection-end-column="21" />
+            <state relative-caret-position="-4399">
+              <caret line="49" column="0" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
               <folding>
                 <element signature="e#1#39#0" expanded="true" />
               </folding>
@@ -343,7 +342,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="AI-Homework-4" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/contest/capture.py" />
-      <option name="PARAMETERS" value="-r baselineTeam -b team1 -l RANDOM-1243" />
+      <option name="PARAMETERS" value="-r baselineTeam -b team1 -l RANDOM-2222222" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
@@ -381,6 +380,23 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
+    <configuration default="false" name="ManualVsExploit" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/contest" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="AI-Homework-4" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/contest/capture.py" />
+      <option name="PARAMETERS" value="--keys0 -b team1" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
     <configuration default="false" name="ManualRandom" type="PythonConfigurationType" factoryName="Python">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -415,14 +431,15 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
-    <list size="7">
+    <list size="8">
       <item index="0" class="java.lang.String" itemvalue="Python.BaseLineTest" />
       <item index="1" class="java.lang.String" itemvalue="Python.myTeamTest" />
       <item index="2" class="java.lang.String" itemvalue="Python.myTeamRandom" />
       <item index="3" class="java.lang.String" itemvalue="Python.myTeamRandomRed" />
       <item index="4" class="java.lang.String" itemvalue="Python.myTeamManual" />
-      <item index="5" class="java.lang.String" itemvalue="Python.ManualRandom" />
-      <item index="6" class="java.lang.String" itemvalue="Python.myTeamManualRecorded" />
+      <item index="5" class="java.lang.String" itemvalue="Python.ManualVsExploit" />
+      <item index="6" class="java.lang.String" itemvalue="Python.ManualRandom" />
+      <item index="7" class="java.lang.String" itemvalue="Python.myTeamManualRecorded" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
@@ -805,8 +822,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/contest/team1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="218" column="21" selection-start-line="218" selection-start-column="21" selection-end-line="218" selection-end-column="21" />
+        <state relative-caret-position="-4399">
+          <caret line="49" column="0" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
           <folding>
             <element signature="e#1#39#0" expanded="true" />
           </folding>

@@ -48,13 +48,6 @@ class ReflexCaptureAgent(CaptureAgent):
     self.startFood_enemy = self.getFood(gameState)
     self.carriedFood_enemy = self.startFood_enemy
 
-    # self.midWidth = gameState.data.layout.width/2
-    # self.midHeight = gameState.data.layout.height/2
-    # while gameState.data.layout.walls[self.midWidth][self.midHeight]:
-    #     print "moving mid"
-    #     self.midHeight+=randint(-1,1)
-
-
     self.redMidWidth = None
     self.redMidHeight = None
     self.blueMidWidth = None
@@ -134,9 +127,6 @@ class ReflexCaptureAgent(CaptureAgent):
     return {'successorScore': 1.0}
 
 
-  #distancer = Distancer(gameState.data.layout)
-  #distancer.getDistance((1, 1), (10, 10))
-
   # ===========================================================================================
   #======================================ADVANCED FEATURES=====================================
   # ===========================================================================================
@@ -170,50 +160,6 @@ class ReflexCaptureAgent(CaptureAgent):
       return capDistances
 
 
-  # def stayTowardMiddle(self, gameState, myPos):
-  #   distToMiddle = abs(myPos[0] - self.midWidth)
-  #   middleValue = 0
-  #   if self.red:
-  #     if myPos[0] <= self.midWidth:
-  #       middleValue = self.getMazeDistance(myPos, (self.midWidth, self.midHeight)) / 4
-  #       # middleValue = distToMiddle/4
-  #     elif myPos[0] > self.midWidth:
-  #       middleValue = 300
-  #   else:
-  #     if myPos[0] >= self.midWidth:
-  #       middleValue = self.getMazeDistance(myPos, (self.midWidth, self.midHeight)) / 4
-  #       # middleValue = distToMiddle/4
-  #     elif myPos[0] < self.midWidth:
-  #       middleValue = 300
-  #
-  #   return middleValue
-
-  # def stayTowardMiddle(self, gameState, myPos):
-  #     if self.redMidHeight is None:
-  #         self.redMidWidth = (gameState.data.layout.width / 2) - 2
-  #         self.redMidHeight = gameState.data.layout.height / 2
-  #         self.blueMidWidth = (gameState.data.layout.width / 2) + 2
-  #         self.blueMidHeight = gameState.data.layout.height / 2
-  #         while gameState.data.layout.walls[self.redMidWidth][self.redMidHeight]:
-  #             print "moving mid"
-  #             self.redMidHeight += 1
-  #             self.redMidWidth -= 1
-  #         while gameState.data.layout.walls[self.blueMidWidth][self.blueMidHeight]:
-  #             print "moving mid"
-  #             self.blueMidHeight -= 1
-  #             self.blueMidWidth += 1
-  #     if self.red:
-  #         if myPos[0] <= self.redMidWidth:
-  #             middleValue = self.getMazeDistance(myPos, (self.redMidWidth, self.redMidHeight))
-  #         elif myPos[0] > self.redMidWidth:
-  #             middleValue = 300 + self.getMazeDistance(myPos, (self.redMidWidth, self.redMidHeight))
-  #     else:
-  #         if myPos[0] >= self.blueMidWidth:
-  #             middleValue = self.getMazeDistance(myPos, (self.blueMidWidth, self.blueMidHeight))
-  #         elif myPos[0] < self.blueMidWidth:
-  #             middleValue = 300 + self.getMazeDistance(myPos, (self.blueMidWidth, self.blueMidHeight))
-  #
-  #     return middleValue
 
   def stayTowardMiddle(self, gameState, myPos):
       middleValue = 0
@@ -415,119 +361,6 @@ class ExploitationAgent(ReflexCaptureAgent):
               'middleDistance': -0.25 * campSwitch,
               'enemyDistance': -.5,
               'capsuleCamp': -.25 * campSwitch}
-
-#----------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------
-
-class OffensiveReflexAgent(ReflexCaptureAgent):
-  """
-  A reflex agent that seeks food. This is an agent
-  we give you to get an idea of what an offensive agent might look like,
-  but it is by no means the best or only way to build an offensive agent.
-  """
-  def getFeatures(self, gameState, action):
-    features = util.Counter()
-    successor = self.getSuccessor(gameState, action)
-    foodList = self.getFood(successor).asList()
-    features['successorScore'] = -len(foodList)#self.getScore(successor)
-
-    # Compute distance to the nearest food
-    if len(foodList) > 0: # This should always be True,  but better safe than sorry
-      myPos = successor.getAgentState(self.index).getPosition()
-      minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
-      features['distanceToFood'] = minDistance
-    return features
-
-  def getWeights(self, gameState, action):
-    return {'successorScore': 100, 'distanceToFood': -1}
-
-#----------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------
-
-class DefensiveReflexAgent(ReflexCaptureAgent):
-  """
-  A reflex agent that keeps its side Pacman-free. Again,
-  this is to give you an idea of what a defensive agent
-  could be like.  It is not the best or only way to make
-  such an agent.
-  """
-
-  def getFeatures(self, gameState, action):
-    features = util.Counter()
-    successor = self.getSuccessor(gameState, action)
-
-    myState = successor.getAgentState(self.index)
-    myPos = myState.getPosition()
-
-    # Computes whether we're on defense (1) or offense (0)
-    features['onDefense'] = 1
-    if myState.isPacman: features['onDefense'] = 0
-
-    # Computes distance to invaders we can see
-    enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
-    invaders = [a for a in enemies if a.isPacman and a.getPosition() != None]
-    features['numInvaders'] = len(invaders)
-    if len(invaders) > 0:
-      dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
-      features['invaderDistance'] = min(dists)
-
-    if action == Directions.STOP: features['stop'] = 1
-    rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
-    if action == rev: features['reverse'] = 1
-
-    return features
-
-  def getWeights(self, gameState, action):
-    return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -10, 'stop': -100, 'reverse': -2}
-
-# ----------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------
-
-
-class DummyAgent(CaptureAgent):
-  """
-  A Dummy agent to serve as an example of the necessary agent structure.
-  You should look at baselineTeam.py for more details about how to
-  create an agent as this is the bare minimum.
-  """
-
-  def registerInitialState(self, gameState):
-    """
-    This method handles the initial setup of the
-    agent to populate useful fields (such as what team
-    we're on).
-
-    A distanceCalculator instance caches the maze distances
-    between each pair of positions, so your agents can use:
-    self.distancer.getDistance(p1, p2)
-
-    IMPORTANT: This method may run for at most 15 seconds.
-    """
-
-    '''
-    Make sure you do not delete the following line. If you would like to
-    use Manhattan distances instead of maze distances in order to save
-    on initialization time, please take a look at
-    CaptureAgent.registerInitialState in captureAgents.py.
-    '''
-    CaptureAgent.registerInitialState(self, gameState)
-
-    '''
-    Your initialization code goes here, if you need any.
-    '''
-
-
-  def chooseAction(self, gameState):
-    """
-    Picks among actions randomly.
-    """
-    actions = gameState.getLegalActions(self.index)
-
-    '''
-    You should change this in your own agent.
-    '''
-
-    return random.choice(actions)
 
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
