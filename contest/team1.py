@@ -162,6 +162,19 @@ class ReflexCaptureAgent(CaptureAgent):
       return capDistances
 
 
+  def enemyCapsuleDistance(self, position, successor):
+      capLocations = self.getCapsules(successor)
+      enemyCapDistance = 0
+
+      if len(capLocations) == 1:
+          for cx, cy in capLocations:
+              enemyCapDistance = self.getMazeDistance(position, (cx, cy))
+
+      if len(capLocations) > 1:
+        enemyCapDistance = min(self.getMazeDistance(position, capLocations[0]),self.getMazeDistance(position, capLocations[1]))
+
+      return enemyCapDistance
+
 
   def stayTowardMiddle(self, gameState, myPos):
       middleValue = 0
@@ -200,11 +213,30 @@ class ReflexCaptureAgent(CaptureAgent):
             print c[index] - o[index]
 
 
+  # def getEnemyDistances(self, gameState):
+  #   if self.red:
+  #     enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 0]
+  #   else:
+  #     enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 1]
+  #   return enemyDist
   def getEnemyDistances(self, gameState):
+    myPos = gameState.getAgentPosition(self.index)
+    opponents = self.getOpponents(gameState)
+    enemyDist = []
     if self.red:
-      enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 0]
+        for i in opponents:
+            enemyPos = gameState.getAgentPosition(i)
+            if enemyPos is not None:
+                enemyDist.append(self.getMazeDistance(myPos,enemyPos))
+            else:
+                enemyDist.append(gameState.agentDistances[i])
     else:
-      enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 1]
+        for i in opponents:
+            enemyPos = gameState.getAgentPosition(i)
+            if enemyPos is not None:
+                enemyDist.append(self.getMazeDistance(myPos,enemyPos))
+            else:
+                enemyDist.append(gameState.agentDistances[i])
     return enemyDist
 
   #TODO Make it so that they are no longer carrying when scored
@@ -329,21 +361,32 @@ class ExploitationAgent(ReflexCaptureAgent):
 
     features['capsuleCamp'] = self.campCapsule(myPos, gameState)
 
+    features['capsuleGrab'] = self.enemyCapsuleDistance(myPos,gameState)
+
     self.safe = self.isSafe(gameState, myPos, foodList)
     if self.safe:
         self.safetySwitch = 1
 
 
+    #print self.getEnemyDistances(gameState)
+
     self.enemyCarrying = self.isEnemyCarrying(gameState, self.pastObservation)
     self.teamCarrying = self.isTeamCarrying(gameState, self.pastObservation)
+
+    if features['capsuleGrab'] < features['enemyDistance'] and features['capsuleGrab'] < 10 and features['capsuleGrab'] != 0:
+        self.grabCapsule = 1
+        #print "GET DAT CAPSULE"
+    else:
+        self.grabCapsule = 0
+
 
     return features
 
   def getWeights(self, gameState, action):
 
       #Switch distance to food based on if they are recently dead
-      #if self.safetySwitch:
-      if self.recentDeath:
+      if self.safetySwitch:
+      #if self.recentDeath:
           campSwitch = 0
       else:
           campSwitch = 1
@@ -354,22 +397,26 @@ class ExploitationAgent(ReflexCaptureAgent):
       #If time is almost up, we are losing, and we arent holding --> GO AFTER DOTS
       if gameState.data.timeleft < 400 and not self.teamCarrying and self.losing:
           campSwitch = 0
-          print "GET DOTS BEFORE WE LOSE"
+          #print "GET DOTS BEFORE WE LOSE"
 
       #Grab a dot and peace out.
       if self.teamCarrying:
           self.recentDeath = 0
 
+
+
+
       #use binary switches to turn weights on and off
-      return {'successorScore':-100 * (campSwitch-1),
+      return {'capsuleGrab':-500 * self.grabCapsule * campSwitch,
+              'successorScore':-100 * (campSwitch-1),
               'distanceToFood':1 * (campSwitch-1),
-              'numInvaders': -100,
-              'onDefense': 10 * (self.teamCarrying+1),
+              'numInvaders': -100 * campSwitch,
+              'onDefense': 100 * (self.teamCarrying+1),
               'invaderDistance': -10 * self.enemyCarrying,
               'stop': -100,
               'reverse': -2,
               'middleDistance': -0.25 * campSwitch,
-              'enemyDistance': -.5,
+              'enemyDistance': -.55,
               'capsuleCamp': -.25 * campSwitch}
 
 #----------------------------------------------------------------------------------------------------------
