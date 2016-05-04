@@ -133,6 +133,7 @@ class ReflexCaptureAgent(CaptureAgent):
   #======================================ADVANCED FEATURES=====================================
   # ===========================================================================================
 
+  #This feature will check if it is safe to grab food using the enemy distance and the closest food.
   def isSafe(self, gameState, myPos, foodList):
       safetyThresh = 2
       enemyDist = self.getEnemyDistances(gameState)
@@ -143,9 +144,8 @@ class ReflexCaptureAgent(CaptureAgent):
           canGetFood = False
       return canGetFood
 
-
+  #This feature will tell the agents to defend the power pills on our side.
   def campCapsule(self, position, successor):
-
       capLocations = self.getCapsulesYouAreDefending(successor)
       capDistances = 0
 
@@ -161,7 +161,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
       return capDistances
 
-
+  #This feature will return the distance of the closest power pill to grab.
   def enemyCapsuleDistance(self, position, successor):
       capLocations = self.getCapsules(successor)
       enemyCapDistance = 0
@@ -176,7 +176,9 @@ class ReflexCaptureAgent(CaptureAgent):
       return enemyCapDistance
 
 
-  def stayTowardMiddle(self, gameState, myPos):
+  #This feature will guide our agents to defending our weakest spot.
+  #Initially this will be the edge of our side but will shift to the dots furthest out
+  def defendFocusArea(self, gameState, myPos):
       middleValue = 0
       if self.red:
           yourFood = self.getFoodYouAreDefending(gameState)
@@ -212,13 +214,7 @@ class ReflexCaptureAgent(CaptureAgent):
         for index in range(len(o)):
             print c[index] - o[index]
 
-
-  # def getEnemyDistances(self, gameState):
-  #   if self.red:
-  #     enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 0]
-  #   else:
-  #     enemyDist = [gameState.agentDistances[i] for i in range(len(gameState.teams)) if i % 2 == 1]
-  #   return enemyDist
+  #This feature is simply the distances to the enemies
   def getEnemyDistances(self, gameState):
     myPos = gameState.getAgentPosition(self.index)
     opponents = self.getOpponents(gameState)
@@ -239,7 +235,7 @@ class ReflexCaptureAgent(CaptureAgent):
                 enemyDist.append(gameState.agentDistances[i])
     return enemyDist
 
-  #TODO Make it so that they are no longer carrying when scored
+  #This feature will return true if the enemy is carrying dots
   def isEnemyCarrying(self, gameState, pastObservation):
       currentFood = self.getFoodYouAreDefending(gameState)
 
@@ -271,6 +267,7 @@ class ReflexCaptureAgent(CaptureAgent):
         return 1
       return 0
 
+  #This feature will return true if our team is carrying dots
   def isTeamCarrying(self, gameState, pastObservation):
       currentFood = self.getFood(gameState)
 
@@ -280,17 +277,14 @@ class ReflexCaptureAgent(CaptureAgent):
       teamScored = 0
       if self.red:
           if scoreChange > 0:
-              print "we Scored"
+              #print "we Scored"
               teamScored = 1
       else:
           if scoreChange < 0:
-              print "we Scored"
+              #print "we Scored"
               teamScored = 1
 
       foodDropped = sum(x.count(1) for x in currentFood.data) > sum(x.count(1) for x in self.carriedFood_enemy.data)
-      if foodDropped:
-          print "We dropped their food"
-
       if foodDropped or teamScored:
         self.startFood_enemy = currentFood
         self.carriedFood_enemy = currentFood
@@ -303,7 +297,7 @@ class ReflexCaptureAgent(CaptureAgent):
         return 1
       return 0
 
-
+#14533 as red is super loss
 #----------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------
 
@@ -322,16 +316,13 @@ class ExploitationAgent(ReflexCaptureAgent):
     myState = successor.getAgentState(self.index)
     myPos = myState.getPosition()
 
+    #Set the previous gamestate variable once there has been one.
     if gameState.data.timeleft < 1196:
         self.pastObservation = self.getPreviousObservation()
 
-    #self.enemyRecentlyDied(gameState)
 
     # Computes whether we're on defense (1) or offense (0)
     features['onDefense'] = 1
-    #if self.isEnemyCarrying(gameState): features['onDefense'] = 0
-    #if myState.isPacman: features['onDefense'] = 0
-
 
     # Compute distance to the nearest food
     foodList = self.getFood(successor).asList()
@@ -353,9 +344,9 @@ class ExploitationAgent(ReflexCaptureAgent):
     rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
     if action == rev: features['reverse'] = 1
 
-    features['successorScore'] = -len(foodList)#self.getScore(successor)
+    features['successorScore'] = -len(foodList)
 
-    features['middleDistance'] = self.stayTowardMiddle(gameState, myPos)
+    features['middleDistance'] = self.defendFocusArea(gameState, myPos)
 
     features['enemyDistance'] = min(self.getEnemyDistances(gameState))
 
@@ -367,12 +358,11 @@ class ExploitationAgent(ReflexCaptureAgent):
     if self.safe:
         self.safetySwitch = 1
 
-
-    #print self.getEnemyDistances(gameState)
-
+    # Calculate if either team is carrying dots.
     self.enemyCarrying = self.isEnemyCarrying(gameState, self.pastObservation)
     self.teamCarrying = self.isTeamCarrying(gameState, self.pastObservation)
 
+    #If there is a capsule within 10 blocks and closer than an enemy, go for the power pill
     if features['capsuleGrab'] < features['enemyDistance'] and features['capsuleGrab'] < 10 and features['capsuleGrab'] != 0:
         self.grabCapsule = 1
         #print "GET DAT CAPSULE"
@@ -404,9 +394,8 @@ class ExploitationAgent(ReflexCaptureAgent):
           self.recentDeath = 0
 
 
-
-
       #use binary switches to turn weights on and off
+      #Use the switches to switch the weights on and off the adjust offense and defensive behavior
       return {'capsuleGrab':-500 * self.grabCapsule * campSwitch,
               'successorScore':-100 * (campSwitch-1),
               'distanceToFood':1 * (campSwitch-1),
