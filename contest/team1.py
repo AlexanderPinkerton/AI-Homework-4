@@ -1,4 +1,9 @@
 
+##TEAM 1
+##Alexander Pinkerton, Tabitha Bleil, Caleb Burkholder
+
+
+
 from captureAgents import CaptureAgent
 import random, time, util, math
 from game import Directions
